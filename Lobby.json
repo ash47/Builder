@@ -1,0 +1,16 @@
+{
+	"mainFields": ["GoldPerSecond"], 
+	"fields": {
+		"GoldPerSecond": {
+			"type": "select",
+			"options":	[
+				"0 Bonus GPS",
+				"5  Bonus GPS",
+				"10 Bonus GPS",
+				"15 Bonus GPS",
+				"20 Bonus GPS",
+				"50 Bonus GPS"
+			]
+		}
+	}
+}

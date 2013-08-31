@@ -1,0 +1,75 @@
+###Change Log###
+###1.4###
+* Major changes
+* Compeltely change upgrade system
+* Upgrades now have a cap
+* Fixed rune spawning and creep spawning even after rax / tp was smashed
+* Added more upgrades to towers
+* Towers now have 6 item slots
+* Added some sounds
+* Restricted the move distance of -move
+* Decreased cooldown of -move
+
+###1.3.3###
+* Fixed gold issues, it is now compatible with latest version of dota
+
+###1.3.2###
+* Changed build cooldown to 3
+* Changed move cooldown to 10
+
+###1.3.1###
+* Added build protection -- unable to build inside enemies base
+* No filler buildings spawn anymore
+* INTERNAL: Started to add debug controls
+* Fixed -move
+
+###1.3###
+* Major balance change: Added various cooldowns
+* Players must wait 15 seconds before moving a building
+* Players must wait 15 seconds before building a new building
+* If a building it attacked, there is a 5 second period where it can not be moved
+* Renamed dragon to dragonkin
+* Fixed towers costing 1g (opps)
+* You can now upgrade forts (ancients)
+
+###1.2.6###
+* Started to clean code up
+* Fixed minor bugs
+* Players can now give items to their ancients
+
+###1.2.5###
+* Fixed creeps spawning as towers
+
+###1.2.4###
+* Rax are now destoyable
+* Rax model changed because it made them unbreakable
+
+###1.2.3###
+* Fixed some errors with rax
+* Fixed some errors with rune spawners
+
+###1.2.2###
+* Removed some debug server.prints that shouldnt have existed
+
+###1.2.1###
+* Removed Roshan from RAX
+
+####1.2####
+* Added -select (to select a building)
+* Added -move (to move a selected building)
+* Moved upgrades to a seperate file
+* Added RAX
+* Changed -give and -take slots from (0-5) to (1-6)
+* Changed help printing
+
+####1.1####
+* Changed -upgrade completely
+* -upgrade now supports more buildings
+* Added tp Rune spawner upgrade
+* Added tp Vision Upgrade
+* Added tp Shop Upgrade
+* -upgrade no longer removes items from towers that it didnt put there
+* Added -give and -take, allowing you to give / take items from towers
+
+####1.0####
+Initial Plugin
