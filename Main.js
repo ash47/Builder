@@ -8,7 +8,7 @@ buildings that heal shit
 var DEBUG = false;
 
 // Grab libraries
-var timers = require('timers.js');	// From Lucky Items
+var timers = require('timers');
 var upgradeLib = require('upgrades.js');
 
 // Grab upgrade map
@@ -41,8 +41,6 @@ var playerManager;
 
 // Constants
 var UNIT_LIFE_STATE_ALIVE = 0;
-var MODEL_TOWER_BAD = 0;
-var MODEL_TOWER_GOOD = 0;
 
 // Range Settings
 var BUILD_DISTANCE = 250;				// The distance infront of a hero to build
@@ -100,13 +98,6 @@ var RADIANT_ANCIENT;
 var customUnit = false;
 
 function onMapStart() {
-	// Grab tower model ids
-	var ent = game.findEntityByTargetname('dota_badguys_tower1_top');
-	MODEL_TOWER_BAD = ent.netprops.m_nModelIndex;
-	
-	ent = game.findEntityByTargetname('dota_goodguys_tower1_top');
-	MODEL_TOWER_GOOD = ent.netprops.m_nModelIndex;
-	
 	// Register all towers into the upgrade system
 	var ents = game.findEntitiesByClassname('npc_dota_tower');
 	for(var i=0;i<ents.length;++i) {
