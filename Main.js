@@ -1323,7 +1323,15 @@ function findBuilding(pos) {
 
 // Grabs a hero or return false if the client doesn't have one
 function grabHero(client) {
-	var hero = client.netprops.m_hAssignedHero;
+	var heroes = client.getHeroes();
+	if(heroes.length <= 0) {
+		// Tell the user they can't build yet:
+		client.printToChat('You don\'t seem to have any heroes yet.');
+		return null;
+	}
+	
+	// Grab their first hero
+	var hero = heroes[0];
 	
 	// Check if the player is ingame:
 	if(!hero) {
@@ -1332,6 +1340,7 @@ function grabHero(client) {
 		return null;
 	}
 	
+	// Make sure it's a hero
 	if (!hero.isHero()) return null;
 	
 	// Ensure they are alive
