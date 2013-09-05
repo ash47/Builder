@@ -1361,7 +1361,7 @@ function getClientGold(client) {
 	}
 	
 	// Grab the clients team
-	var team = client.netprops.m_iTeamNum;
+	var team = playerManager.netprops.m_iPlayerTeams[playerID];
 	
 	// Declare variables (yes, you are reading redundent comments)
 	var reliableGold;
@@ -1399,7 +1399,7 @@ function setClientGold(client, gold) {
 	}
 	
 	// Grab the clients team
-	var team = client.netprops.m_iTeamNum;
+	var team = playerManager.netprops.m_iPlayerTeams[playerID]
 	
 	// Set their gold, depending on their team
 	if(team == dota.TEAM_RADIANT) {
