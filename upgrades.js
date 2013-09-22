@@ -751,6 +751,8 @@ exports.upgradeMap = {
 };
 
 exports.setTowerLevel = function(tower, level) {
+	if(!tower || !tower.isValid()) return;
+	
 	// Grab health stats
 	var oldMaxHealth = tower.netprops.m_iMaxHealth;
 	var oldHealth = tower.netprops.m_iHealth;

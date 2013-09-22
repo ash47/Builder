@@ -107,7 +107,9 @@ function onMapStart() {
 	// Remove all buildings
 	var b = game.findEntitiesByClassname('npc_dota_building');
 	for(var i=0;i<b.length;i++) {
-		dota.remove(b[i]);
+		if(b[i] && b[i].isValid()) {
+			dota.remove(b[i]);
+		}
 	}
 	
 	// Grab the player manager
@@ -1094,6 +1096,8 @@ function onUnitThink(ent) {
 function onEntityHurt(event) {
 	// Grab the entity that was attacked
 	var ent = game.getEntityByIndex(event.getInt('entindex_killed'));
+	if(!ent || !ent.isValid()) return;
+	
 	var attacker = game.getEntityByIndex(event.getInt('entindex_attacker'));
 	
 	// Ensure it was built
@@ -1284,6 +1288,8 @@ function ShopCheck(ent) {
 
 // Calculates the distance between two vectors (not taking into account for z)
 function vecDist(vec1, vec2) {
+	if(!vec1 || !vec2) return 1000000;
+	
 	var xx = (vec1.x - vec2.x);
 	var yy = (vec1.y - vec2.y);
 	
@@ -1399,7 +1405,7 @@ function setClientGold(client, gold) {
 	}
 	
 	// Grab the clients team
-	var team = playerManager.netprops.m_iPlayerTeams[playerID]
+	var team = playerManager.netprops.m_iPlayerTeams[playerID];
 	
 	// Set their gold, depending on their team
 	if(team == dota.TEAM_RADIANT) {
