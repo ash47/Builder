@@ -37,7 +37,9 @@ game.hook('Dota_OnBuyItem', onBuyItem);
 game.hookEvent("entity_hurt", onEntityHurt);
 
 // To look at gold etc
-var playerManager;
+var playerManager = null;
+var data_dire = null;
+var data_radiant = null;
 
 // Constants
 var UNIT_LIFE_STATE_ALIVE = 0;
@@ -114,6 +116,9 @@ function onMapStart() {
 	
 	// Grab the player manager
 	playerManager = game.findEntityByClassname(-1, "dota_player_manager");
+	
+	data_dire = game.findEntityByClassname(-1, "dota_data_dire");
+	data_radiant = game.findEntityByClassname(-1, "dota_data_radiant");
 	
 	if(playerManager == null) {
 		server.print('\n\nFAILED TO FIND RESOURCE HANDLE\n\n');
@@ -1375,11 +1380,11 @@ function getClientGold(client) {
 	
 	// Read their gold, where we read depends on their team
 	if(team == dota.TEAM_RADIANT) {
-		reliableGold = playerManager.netprops.m_iReliableGoldRadiant[playerID];
-		unreliableGold = playerManager.netprops.m_iUnreliableGoldRadiant[playerID];
+		unreliableGold = data_radiant.netprops.m_iUnreliableGold[playerID];
+		reliableGold = data_radiant.netprops.m_iReliableGold[playerID];
 	} else if(team == dota.TEAM_DIRE) {
-		reliableGold = playerManager.netprops.m_iReliableGoldDire[playerID];
-		unreliableGold = playerManager.netprops.m_iUnreliableGoldDire[playerID];
+		unreliableGold = data_dire.netprops.m_iUnreliableGold[playerID];
+		reliableGold = data_dire.netprops.m_iReliableGold[playerID];
 	} else {
 		return null;
 	}
@@ -1404,19 +1409,13 @@ function setClientGold(client, gold) {
 		return false;
 	}
 	
-	// Grab the clients team
-	var team = playerManager.netprops.m_iPlayerTeams[playerID];
+	// Grab current gold
+	var currentGold = getClientGold(client);
+	if(!currentGold) return false;
 	
-	// Set their gold, depending on their team
-	if(team == dota.TEAM_RADIANT) {
-		playerManager.netprops.m_iReliableGoldRadiant[playerID] = gold.r;
-		playerManager.netprops.m_iUnreliableGoldRadiant[playerID] = gold.u;
-	} else if(team == dota.TEAM_DIRE) {
-		playerManager.netprops.m_iReliableGoldDire[playerID] = gold.r;
-		playerManager.netprops.m_iUnreliableGoldDire[playerID] = gold.u;
-	} else {
-		return false;
-	}
+	// Give the difference in current gold
+	dota.givePlayerGold(playerID, gold.r - currentGold.r, true);
+	dota.givePlayerGold(playerID, gold.u - currentGold.u, false);
 	
 	return true;
 }
