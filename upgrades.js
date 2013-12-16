@@ -1,8 +1,20 @@
+var timers = require('timers');
+
 // Hook stuff
 game.hook('Dota_OnGetAbilityValue', onGetAbilityValue);
 
 // How much the vision the vision upgrade adds
-INCREASE_VISION_RANGE = 300;
+var INCREASE_VISION_RANGE = 300;
+
+var SHOP_RANGE = 500;					// Range for the shop to work
+
+var shopList = new Array();
+
+// Constants
+var UNIT_LIFE_STATE_ALIVE = 0;
+
+var RUNE_DISTANCE = 200;				// Distance away from a rune spawner a rune spawns
+
 
 // Base Values
 var BASE_HEALTH = 1300;
@@ -96,7 +108,7 @@ exports.upgradeMap = {
 				ent.acidModder.netprops.m_iLevel = currentLevel+1;
 				
 				// Apply the mod
-				dota.addNewModifier(ent, ent.acidModder, 'modifier_viper_corrosive_skin', "viper_corrosive_skin", {});
+				dota.addNewModifier(ent, ent.acidModder, 'modifier_viper_corrosive_skin', "viper_corrosive_skin", {}, ent);
 			}
 		},
 		
@@ -720,7 +732,7 @@ exports.upgradeMap = {
 							}
 						}
 					} else {
-						timer.clearTimer(timer)
+						timers.clearTimer(timer)
 					}
 				}, RUNE_SPAWN_CHECK);
 				
@@ -750,12 +762,18 @@ exports.upgradeMap = {
 	)
 };
 
-exports.setTowerLevel = function(tower, level) {
+function setTowerLevel(tower, level) {
 	if(!tower || !tower.isValid()) return;
 	
 	// Grab health stats
 	var oldMaxHealth = tower.netprops.m_iMaxHealth;
 	var oldHealth = tower.netprops.m_iHealth;
+	
+	// Remove tower if it is dead
+	if(oldHealth <= 0) {
+		dota.remove(tower);
+		return;
+	}
 	
 	// Workout how much damage has been done
 	var towerDamage = oldMaxHealth - oldHealth;
@@ -791,11 +809,13 @@ exports.setTowerLevel = function(tower, level) {
 	};
 	
 	// Apply the mod
-	dota.addNewModifier(tower, tower.statModder, 'modifier_item_blade_mail', "item_blade_mail", {});
+	dota.addNewModifier(tower, tower.statModder, 'modifier_item_blade_mail', "item_blade_mail", {}, tower);
 	
 	// Reset mod values
 	modValues = false;
 }
+
+exports.setTowerLevel = setTowerLevel;
 
 // Convert degrees to radians
 function toRadians (angle) {
@@ -839,4 +859,116 @@ function GrabRune() {
 	}
 	
 	return null;
+}
+
+game.hook('Dota_OnBuyItem', function(ent, itemName, playerID, unknown) {
+	// Check for a makeshift shop
+	ShopCheck(ent);
+	
+	// Allow them to buy the item
+	return true;
+});
+
+// Allow clients to enter a shop
+console.addClientCommand('shop', function(client, args) {
+	var hero = grabHero(client);
+	if(!hero){ return; }
+	
+	// Check for a makeshift shop
+	if(!ShopCheck(hero)) {
+		client.printToChat('You are not near any tps with a shop upgrade.');
+	}
+});
+
+// Checks if a player is hero is near a makeshift shop, and enables shop on them
+function ShopCheck(ent) {
+	var oldShop = ent.netprops.m_iCurShop;
+	
+	if(oldShop == 6) {
+		// Grab their position
+		var pos = ent.netprops.m_vecOrigin;
+		
+		for(var i=0;i<shopList.length;++i) {
+			// Check if it's a shop
+			if(shopList[i]) {
+				// Workout distance to this tower
+				var dist = vecDist(pos, shopList[i].netprops.m_vecOrigin);
+				
+				// Check if the distance is less then the threshold
+				if(dist < SHOP_RANGE) {
+					// Ensure they are in a shop
+					ent.netprops.m_iCurShop = 0;
+					
+					var timer;
+					var shopEnt = shopList[i];
+					
+					// Pull them out of the shop straight away
+					timer = timers.setInterval(function() {
+						// Ensure our ent still exists
+						if(!ent) {
+							timers.clearTimer(timer);
+							return;
+						}
+						
+						// Check if they moved out of range of the shop
+						var dist = vecDist(ent.netprops.m_vecOrigin, shopEnt.netprops.m_vecOrigin);
+						
+						if(dist > SHOP_RANGE) {
+							// Set their shop back
+							ent.netprops.m_iCurShop = oldShop;
+							
+							// Remove this timer
+							timers.clearTimer(timer);
+						}
+					}, 1000);
+					
+					return true;
+				}
+			}
+		}
+	}
+	
+	// They aren't near any shops
+	return false;
+}
+
+// Grabs a hero or return false if the client doesn't have one
+function grabHero(client) {
+	var heroes = client.getHeroes();
+	if(heroes.length <= 0) {
+		// Tell the user they can't build yet:
+		client.printToChat('You don\'t seem to have any heroes yet.');
+		return null;
+	}
+	
+	// Grab their first hero
+	var hero = heroes[0];
+	
+	// Check if the player is ingame:
+	if(!hero) {
+		// Tell the user they can't build yet:
+		client.printToChat('You can\'t use this until you are ingame.');
+		return null;
+	}
+	
+	// Make sure it's a hero
+	if (!hero.isHero()) return null;
+	
+	// Ensure they are alive
+	if(hero.netprops.m_lifeState != UNIT_LIFE_STATE_ALIVE) {
+		client.printToChat('You must be alive to use this command.');
+		return null;
+	}
+	
+	return hero;
+}
+
+// Calculates the distance between two vectors (not taking into account for z)
+function vecDist(vec1, vec2) {
+	if(!vec1 || !vec2) return 1000000;
+	
+	var xx = (vec1.x - vec2.x);
+	var yy = (vec1.y - vec2.y);
+	
+	return Math.sqrt(xx*xx + yy*yy);
 }

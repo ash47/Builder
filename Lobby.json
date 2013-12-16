@@ -1,5 +1,5 @@
 {
-	"mainFields": ["GoldPerSecond"], 
+	"mainFields": [], 
 	"fields": {
 		"GoldPerSecond": {
 			"type": "select",
@@ -10,6 +10,14 @@
 				"15 Bonus GPS",
 				"20 Bonus GPS",
 				"50 Bonus GPS"
+			]
+		},
+		
+		"Cooldowns": {
+			"type": "select",
+			"options":	[
+				"No Building Cooldowns",
+				"Default Building Cooldowns"
 			]
 		}
 	}
